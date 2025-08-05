@@ -136,8 +136,14 @@ def shuffle_generation(img_name, model, clip, tokenizer,image_instance,token_mas
                 if best_clip_score_list[jj] < clip_score_sequence_batch[jj]:
                     best_clip_score_list[jj] = clip_score_sequence_batch[jj]
                     best_caption_list[jj] = cur_text_batch[jj]
-                logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]},"
-                            f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                try:
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]},"
+                                f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                except UnicodeEncodeError:
+                    # Handle special characters by encoding safely
+                    safe_text = for_print_batch[jj].encode('utf-8', errors='replace').decode('utf-8')
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]},"
+                                f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ safe_text)
         gen_texts_list.append(cur_text_batch)
         clip_score_sequence.append(clip_score_sequence_batch)
     gen_texts_list.append(best_caption_list)
@@ -186,8 +192,14 @@ def span_generation(img_name, model, clip, tokenizer,image_instance,token_mask, 
                 if best_clip_score_list[jj] < clip_score_sequence_batch[jj]:
                     best_clip_score_list[jj] = clip_score_sequence_batch[jj]
                     best_caption_list[jj] = cur_text_batch[jj]
-                logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]},"
-                            f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                try:
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]},"
+                                f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                except UnicodeEncodeError:
+                    # Handle special characters by encoding safely
+                    safe_text = for_print_batch[jj].encode('utf-8', errors='replace').decode('utf-8')
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]},"
+                                f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ safe_text)
         gen_texts_list.append(cur_text_batch)
         clip_score_sequence.append(clip_score_sequence_batch)
     gen_texts_list.append(best_caption_list)
@@ -231,9 +243,15 @@ def random_generation(img_name, model, clip, tokenizer,image_instance,token_mask
                 best_caption_list[jj] = cur_text_batch[jj]
         if verbose and np.mod(ii + 1, print_every) == 0:
             for_print_batch = tokenizer.batch_decode(inp)
-            for jj in range(batch_size):                
-                logger.info(f"iter {ii + 1}, The {jj+1}-th image: {img_name[jj]},"
-                            f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])                
+            for jj in range(batch_size):
+                try:
+                    logger.info(f"iter {ii + 1}, The {jj+1}-th image: {img_name[jj]},"
+                                f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                except UnicodeEncodeError:
+                    # Handle special characters by encoding safely
+                    safe_text = for_print_batch[jj].encode('utf-8', errors='replace').decode('utf-8')
+                    logger.info(f"iter {ii + 1}, The {jj+1}-th image: {img_name[jj]},"
+                                f"clip score {clip_score_sequence_batch[jj]:.3f}: "+ safe_text)                
             gen_texts_list.append(cur_text_batch)
             clip_score_sequence.append(clip_score_sequence_batch)
     gen_texts_list.append(best_caption_list)
@@ -279,7 +297,12 @@ def parallel_generation(img_name, model, clip, tokenizer,image_instance,token_ma
                     best_clip_score_list[jj] = clip_score_sequence_batch[jj]
                     best_caption_list[jj] = cur_text
                 gen_texts.append(cur_text)
-                logger.info(f"iter {ii + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print)
+                try:
+                    logger.info(f"iter {ii + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}: "+ for_print)
+                except UnicodeEncodeError:
+                    # Handle special characters by encoding safely
+                    safe_text = for_print.encode('utf-8', errors='replace').decode('utf-8')
+                    logger.info(f"iter {ii + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}: "+ safe_text)
         gen_texts_list.append(gen_texts)
         clip_score_sequence.append(clip_score_sequence_batch)
     gen_texts_list.append(best_caption_list)

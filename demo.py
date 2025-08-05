@@ -5,6 +5,10 @@ import argparse
 import json
 from PIL import Image
 import torch
+import warnings
+
+# Suppress deprecation warnings for RobertaSdpaSelfAttention
+warnings.filterwarnings("ignore", message=".*RobertaSdpaSelfAttention.*")
 
 from clip.clip import CLIP
 from gen_utils import generate_caption
@@ -26,7 +30,7 @@ def get_args():
                         nargs='?',
                         choices=['caption', 'controllable'])
     parser.add_argument('--prompt',
-                        default='Image of a',type=str)
+                        default='A detailed photograph showing',type=str)
     parser.add_argument('--order',
                         default='shuffle',
                         nargs='?',
@@ -38,33 +42,34 @@ def get_args():
                         choices=["sentiment","pos"],
                         help="which controllable task to conduct")
     parser.add_argument('--pos_type', type=list,
-                        default=[['DET'], ['ADJ','NOUN'], ['NOUN'],
-                                 ['VERB'], ['VERB'],['ADV'], ['ADP'],
-                                 ['DET','NOUN'], ['NOUN'], ['NOUN','.'],
-                                 ['.','NOUN'],['.','NOUN']],
+                        default=[['DET'], ['ADJ','ADJ','NOUN'], ['NOUN'],
+                                 ['VERB'], ['ADV'], ['ADP'], ['DET','ADJ','NOUN'],
+                                 ['NOUN'], ['VERB'], ['ADP'], ['DET','NOUN'],
+                                 ['ADJ'], ['NOUN'], ['ADP'], ['DET','NOUN'],
+                                 ['NOUN'], ['ADP'], ['NOUN'], ['.']],
                         help="predefined part-of-speech templete")
     parser.add_argument('--sentiment_type',
                         default="positive",
                         nargs='?',
                         choices=["positive", "negative"])
     parser.add_argument('--samples_num',
-                        default=2,type=int)
+                        default=3,type=int)
 
     ## Hyperparameters
-    parser.add_argument("--sentence_len", type=int, default=10)
-    parser.add_argument("--candidate_k", type=int, default=200)
+    parser.add_argument("--sentence_len", type=int, default=20)
+    parser.add_argument("--candidate_k", type=int, default=300)
     parser.add_argument("--alpha", type=float, default=0.02, help="weight for fluency")
-    parser.add_argument("--beta", type=float, default=2.0, help="weight for image-matching degree")
+    parser.add_argument("--beta", type=float, default=3.0, help="weight for image-matching degree")
     parser.add_argument("--gamma", type=float, default=5.0, help="weight for controllable degree")
     parser.add_argument("--lm_temperature", type=float, default=0.1)
-    parser.add_argument("--num_iterations", type=int, default=10, help="predefined iterations for Gibbs Sampling")
+    parser.add_argument("--num_iterations", type=int, default=25, help="predefined iterations for Gibbs Sampling")
 
     ## Models and Paths
-    parser.add_argument("--lm_model", type=str, default='bert-base-uncased',
+    parser.add_argument("--lm_model", type=str, default='roberta-large',
                         help="Path to language model") # bert,roberta
-    parser.add_argument("--match_model", type=str, default='openai/clip-vit-base-patch32',
+    parser.add_argument("--match_model", type=str, default='openai/clip-vit-large-patch14',
                         help="Path to Image-Text model")  # clip,align
-    parser.add_argument("--caption_img_path", type=str, default='./examples/girl.jpg',
+    parser.add_argument("--caption_img_path", type=str, default='./examples/Screenshot 2025-07-15 171136.png',
                         help="file path of the image for captioning")
     parser.add_argument("--stop_words_path", type=str, default='stop_words.txt',
                         help="Path to stop_words.txt")

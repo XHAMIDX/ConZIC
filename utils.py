@@ -26,7 +26,7 @@ def create_logger(folder, filename):
     stream.setFormatter(colorlog.ColoredFormatter(LOGFORMAT, datefmt='%d %H:%M', log_colors=log_colors))
 
     # print to log file
-    hdlr = logging.FileHandler(os.path.join(folder, filename))
+    hdlr = logging.FileHandler(os.path.join(folder, filename), encoding='utf-8')
     hdlr.setLevel(LOG_LEVEL)
     # hdlr.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
     hdlr.setFormatter(logging.Formatter("%(message)s"))

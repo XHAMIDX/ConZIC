@@ -125,8 +125,14 @@ def sentiment_shuffle_generation(img_name, model, clip, tokenizer,image_instance
                 if best_clip_score_list[jj] < clip_score_sequence_batch[jj]:
                     best_clip_score_list[jj] = clip_score_sequence_batch[jj]
                     best_caption_list[jj] = cur_text_batch[jj]
-                logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}"
-                    f", ctl score {senti_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                try:
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}"
+                        f", ctl score {senti_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                except UnicodeEncodeError:
+                    # Handle special characters by encoding safely
+                    safe_text = for_print_batch[jj].encode('utf-8', errors='replace').decode('utf-8')
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}"
+                        f", ctl score {senti_score_sequence_batch[jj]:.3f}: "+ safe_text)
         gen_texts_list.append(cur_text_batch)
         clip_score_sequence.append(clip_score_sequence_batch)
     gen_texts_list.append(best_caption_list)
@@ -185,9 +191,16 @@ def POS_sequential_generation(img_name, model, clip, tokenizer,image_instance,to
                     best_clip_score_list[jj] = clip_score_sequence_batch[jj]
                     best_ctl_score_list[jj] = ctl_score_sequence_batch[jj]
                     best_caption_list[jj] = cur_text_batch[jj]
-                logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}"
-                    f", ctl score {ctl_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
-                logger.info(pos_tags_sequence_batch[jj])
+                try:
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}"
+                        f", ctl score {ctl_score_sequence_batch[jj]:.3f}: "+ for_print_batch[jj])
+                    logger.info(pos_tags_sequence_batch[jj])
+                except UnicodeEncodeError:
+                    # Handle special characters by encoding safely
+                    safe_text = for_print_batch[jj].encode('utf-8', errors='replace').decode('utf-8')
+                    logger.info(f"iter {iter_num + 1}, The {jj+1}-th image: {img_name[jj]}, clip score {clip_score_sequence_batch[jj]:.3f}"
+                        f", ctl score {ctl_score_sequence_batch[jj]:.3f}: "+ safe_text)
+                    logger.info(pos_tags_sequence_batch[jj])
         gen_texts_list.append(cur_text_batch)
         clip_score_sequence.append(clip_score_sequence_batch)
     gen_texts_list.append(best_caption_list)
