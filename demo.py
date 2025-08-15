@@ -22,15 +22,15 @@ def get_args():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--batch_size", type=int, default=1, help = "Only supports batch_size=1 currently.")
     parser.add_argument("--device", type=str,
-                        default='cuda',choices=['cuda','cpu'])
+                        default='cpu',choices=['cuda','cpu'])
 
     ## Generation and Controllable Type
     parser.add_argument('--run_type',
-                        default='controllable',
+                        default='caption',
                         nargs='?',
                         choices=['caption', 'controllable'])
     parser.add_argument('--prompt',
-                        default='A detailed photograph showing',type=str)
+                        default='A detailed image showing ',type=str)
     parser.add_argument('--order',
                         default='shuffle',
                         nargs='?',
@@ -47,28 +47,30 @@ def get_args():
                                  ['NOUN'], ['VERB'], ['ADP'], ['DET','NOUN'],
                                  ['ADJ'], ['NOUN'], ['ADP'], ['DET','NOUN'],
                                  ['NOUN'], ['ADP'], ['NOUN'], ['.']],
-                        help="predefined part-of-speech templete")
+
+                         help="predefined part-of-speech templete")
+
     parser.add_argument('--sentiment_type',
-                        default="positive",
+                        default="negative",
                         nargs='?',
                         choices=["positive", "negative"])
     parser.add_argument('--samples_num',
                         default=3,type=int)
 
     ## Hyperparameters
-    parser.add_argument("--sentence_len", type=int, default=20)
-    parser.add_argument("--candidate_k", type=int, default=300)
-    parser.add_argument("--alpha", type=float, default=0.02, help="weight for fluency")
-    parser.add_argument("--beta", type=float, default=3.0, help="weight for image-matching degree")
-    parser.add_argument("--gamma", type=float, default=5.0, help="weight for controllable degree")
-    parser.add_argument("--lm_temperature", type=float, default=0.1)
-    parser.add_argument("--num_iterations", type=int, default=25, help="predefined iterations for Gibbs Sampling")
+    parser.add_argument("--sentence_len", type=int, default=6, help="Length of generated caption")
+    parser.add_argument("--candidate_k", type=int, default=50, help="Number of top candidates to consider")
+    parser.add_argument("--alpha", type=float, default=0.8, help="weight for fluency (BERT quality)")
+    parser.add_argument("--beta", type=float, default=1.5, help="weight for image-matching degree (CLIP)")
+    parser.add_argument("--gamma", type=float, default=0.3, help="weight for controllable degree (sentiment/POS)")
+    parser.add_argument("--lm_temperature", type=float, default=0.3, help="Temperature for BERT generation (lower = more focused)")
+    parser.add_argument("--num_iterations", type=int, default=15, help="Iterations for Gibbs Sampling (balance between quality and speed)")
 
     ## Models and Paths
-    parser.add_argument("--lm_model", type=str, default='roberta-large',
-                        help="Path to language model") # bert,roberta
-    parser.add_argument("--match_model", type=str, default='openai/clip-vit-large-patch14',
-                        help="Path to Image-Text model")  # clip,align
+    parser.add_argument("--lm_model", type=str, default='RoBERTa-large-MNLI',
+                        help="Path to language model (bert-large-uncased for better quality)") # bert,roberta
+    parser.add_argument("--match_model", type=str, default='ViT-L/14',
+                        help="Path to Image-Text model (ViT-L/14 for best vision understanding)")  # AlphaCLIP model name
     parser.add_argument("--caption_img_path", type=str, default='./examples/Screenshot 2025-07-15 171136.png',
                         help="file path of the image for captioning")
     parser.add_argument("--stop_words_path", type=str, default='stop_words.txt',
